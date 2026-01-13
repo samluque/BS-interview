@@ -1,0 +1,26 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+
+# Data / outputs
+# Raw data is provided by the user (not committed)
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/README.md
+
+# Processed data is committed (cleaned CSVs ready for analysis)
+# .gitkeep kept for empty-folder tracking
+!data/processed/.gitkeep
+
+# Reports are committed (static HTML exports for reviewers)
+
+
