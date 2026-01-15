@@ -1,0 +1,435 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Theme
+\usetheme{metropolis}
+\usepackage{appendixnumberbeamer}
+
+% Packages
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+
+% Colors
+\definecolor{profit}{RGB}{34, 197, 94}
+\definecolor{cost}{RGB}{220, 38, 38}
+\definecolor{primary}{RGB}{37, 99, 235}
+\definecolor{muted}{RGB}{100, 116, 139}
+
+% Metadata
+\title{Ad Performance Case Study}
+\subtitle{Facebook App Install Campaign Analysis}
+\author{Samuel Luque}
+\date{\today}
+\institute{}
+
+\begin{document}
+
+% =============================================================================
+% TITLE
+% =============================================================================
+\maketitle
+
+% =============================================================================
+% OPENING HOOK
+% =============================================================================
+\begin{frame}{The Headline}
+\begin{center}
+\Large
+\textbf{This campaign was highly profitable}\\[1em]
+\Huge
+\textcolor{profit}{\textbf{+138\% ROI}}\\[1em]
+\normalsize
+\textcolor{muted}{But that's not what the dashboard told us.}
+\end{center}
+
+\pause
+\vspace{1em}
+\begin{columns}
+\column{0.5\textwidth}
+\centering
+\textbf{Dashboard said:}\\
+\$0.02 profit/install
+\column{0.5\textwidth}
+\centering
+\textbf{Reality:}\\
+\$0.05 profit/install
+\end{columns}
+
+\vspace{1em}
+\centering
+\textcolor{muted}{\small More than double.}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{Three Questions}
+\begin{enumerate}
+\item \textbf{How many installs did the campaign actually create?}\\
+\textcolor{muted}{\small (Spoiler: far more than attribution shows)}
+\vspace{0.5em}
+\pause
+\item \textbf{What's the true value of each user?}\\
+\textcolor{muted}{\small (Spoiler: more than day-0 metrics suggest)}
+\vspace{0.5em}
+\pause
+\item \textbf{Can we make this even better?}\\
+\textcolor{muted}{\small (Spoiler: yes, by shifting budget by weekday)}
+\end{enumerate}
+\end{frame}
+
+% =============================================================================
+% THE SITUATION
+% =============================================================================
+\section{The Situation}
+
+\begin{frame}{Campaign Overview}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{The app:}
+\begin{itemize}
+\item Free iOS app
+\item Revenue from in-app purchases \& ads
+\item Market: Brazil
+\end{itemize}
+
+\vspace{1em}
+\textbf{The campaign:}
+\begin{itemize}
+\item Platform: Facebook
+\item Duration: Oct 7 -- Dec 31, 2014
+\item Daily budget cap: \$90
+\item Single creative, broad targeting
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Data sources:}
+\begin{enumerate}
+\item \textbf{Campaign data} (Facebook)\\
+\small Spend, attributed installs, day-0 revenue
+\normalsize
+\vspace{0.5em}
+\item \textbf{App-wide data}\\
+\small Total downloads \& revenue (all users)
+\end{enumerate}
+
+\vspace{1em}
+\textcolor{primary}{\textbf{Key insight:}} The second dataset shows what attribution \textit{doesn't} capture.
+\end{columns}
+\end{frame}
+
+% =============================================================================
+% QUESTION 1: HOW MANY INSTALLS?
+% =============================================================================
+\section{Question 1: How many installs?}
+
+\begin{frame}{The Halo Effect}
+\begin{center}
+\includegraphics[width=0.75\textwidth]{figures/chart1_halo.png}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{The Halo Effect: Key Numbers}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+& \textbf{Before Campaign} & \textbf{During Campaign} \\
+\midrule
+Non-attributed downloads/day & 13 & 855 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pause
+\vspace{1em}
+\begin{center}
+\Huge\textcolor{profit}{\textbf{$60\times$ increase}}
+\end{center}
+
+\vspace{1em}
+\begin{center}
+\textcolor{muted}{These are real users the campaign brought in, but Facebook didn't credit.}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{Two Ways to Calculate CPI}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/chart2_cpi.png}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{CPI: Key Insight}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{CPI\textsubscript{paid}} (Facebook reports)\\
+\Large \$0.07\\
+\normalsize
+\textcolor{muted}{Spend $\div$ Attributed installs}
+
+\pause
+\column{0.5\textwidth}
+\textbf{CPI\textsubscript{all}} (includes halo)\\
+\Large \textcolor{primary}{\textbf{\$0.04}}\\
+\normalsize
+\textcolor{muted}{Spend $\div$ Total installs}
+\end{columns}
+
+\pause
+\vspace{1.5em}
+\begin{center}
+\textcolor{profit}{\textbf{43\% lower acquisition cost}} when we include halo installs.\\[1em]
+\textbf{Working assumption:} CPI\textsubscript{all} is our true acquisition cost.\\[0.5em]
+\textcolor{muted}{\small (The $60\times$ jump is too large to be coincidence, but we'll validate with a geo holdout.)}
+\end{center}
+\end{frame}
+
+% =============================================================================
+% QUESTION 2: TRUE VALUE?
+% =============================================================================
+\section{Question 2: True value per user?}
+
+\begin{frame}{The LTV Problem}
+\textbf{What we have:}
+\begin{itemize}
+\item Day-0 revenue per install: \$0.017 (from Facebook)
+\item Daily totals: revenue \& installs
+\end{itemize}
+
+\vspace{1em}
+\textbf{What we need:}
+\begin{itemize}
+\item 30-day value per user
+\item Payback period
+\end{itemize}
+
+\vspace{1em}
+\textbf{The challenge:} No user-level data.
+
+\vspace{1em}
+\textbf{The approach:} Use \textit{deconvolution} --- work backward from daily revenue patterns to estimate revenue-by-age.
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{LTV Curve vs Acquisition Cost}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figures/chart3_ltv.png}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{LTV: Key Numbers}
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+30-day LTV & \$0.092 \\
+Acquisition cost (CPI\textsubscript{all}) & \$0.039 \\
+\midrule
+\textbf{30-day margin/install} & \textcolor{profit}{\textbf{\$0.053}} \\
+\textbf{Payback} & \textcolor{profit}{\textbf{Day 0}} \\
+\textbf{30-day ROI} & \textcolor{profit}{\textbf{+138\%}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pause
+\vspace{1em}
+\begin{center}
+\textcolor{muted}{63\% of value captured on day 0; 87\% by day 7.}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{Daily Profitability: Dashboard vs Reality}
+\begin{center}
+\includegraphics[width=0.95\textwidth]{figures/chart4_profit.png}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{The Punchline}
+\begin{center}
+\Large
+The dashboard showed \textbf{\$0.02} profit per install.\\[1em]
+\pause
+The real 30-day profit is \textbf{\textcolor{profit}{\$0.05}} per install.\\[2em]
+\normalsize
+\textcolor{muted}{Day-0 metrics understate true economics by more than half.}
+\end{center}
+
+\pause
+\vspace{1em}
+\textbf{December drift:} Performance weakened in December.\\
+\textcolor{muted}{Likely cause: creative fatigue, audience saturation.}\\
+\textcolor{muted}{Action: refresh creatives, monitor cohort quality.}
+\end{frame}
+
+% =============================================================================
+% QUESTION 3: CAN WE DO BETTER?
+% =============================================================================
+\section{Question 3: Can we do better?}
+
+\begin{frame}{Weekday Seasonality}
+\textbf{Observation:} Some weekdays look more efficient than others.
+
+\vspace{1em}
+\textbf{Challenge:} Campaign drifts over time (December $<$ October).
+
+\vspace{1em}
+\textbf{Solution:} Compare weekdays \textit{within the same week}.
+\begin{itemize}
+\item Is Tuesday better than the average day in that week?
+\item This removes drift, isolates weekday effects.
+\end{itemize}
+
+\vspace{1em}
+\textbf{Goal:} Turn weekday patterns into a daily cap schedule.
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{Weekday ROI: Within-Week Comparison}
+\begin{center}
+\includegraphics[width=0.85\textwidth]{figures/chart5_weekday.png}
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{Weekday Caps: The Recommendation}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Day} & \textbf{Relative ROI} & \textbf{Multiplier} & \textbf{Daily Cap} \\
+\midrule
+Tuesday & \textcolor{profit}{$+15\%$} & $1.15\times$ & \$104 \\
+Monday & \textcolor{profit}{$+5\%$} & $1.05\times$ & \$94 \\
+Sunday & \textcolor{profit}{$+4\%$} & $1.04\times$ & \$94 \\
+Wednesday & $-2\%$ & $0.98\times$ & \$88 \\
+Saturday & $-5\%$ & $0.96\times$ & \$86 \\
+Thursday & \textcolor{cost}{$-8\%$} & $0.92\times$ & \$83 \\
+Friday & \textcolor{cost}{$-10\%$} & $0.91\times$ & \$81 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+\begin{center}
+\textbf{Weekly spend stays the same:} $7 \times \$90 = \$630$
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{How to Validate}
+\textbf{A/B test design:}
+\begin{itemize}
+\item \textbf{Week A:} Flat caps (\$90/day)
+\item \textbf{Week B:} Weekday-weighted caps (table above)
+\item Alternate weeks, compare CPI, installs/\$, revenue/\$
+\end{itemize}
+
+\vspace{1em}
+\textbf{Why test?}
+\begin{itemize}
+\item Shifting budget can change ROI (diminishing returns)
+\item Multipliers should be tuned based on results
+\end{itemize}
+
+\vspace{1em}
+\textcolor{muted}{Low-risk: we learn something either way.}
+\end{frame}
+
+% =============================================================================
+% LIMITATIONS & NEXT STEPS
+% =============================================================================
+\section{Limitations \& Next Steps}
+
+\begin{frame}{Limitations}
+\begin{enumerate}
+\item \textbf{No randomized control group}\\
+\textcolor{muted}{Halo effect based on step-change, not a true experiment.}
+\vspace{0.5em}
+\item \textbf{Aggregate data only}\\
+\textcolor{muted}{LTV inferred from totals, not tracked per user.}
+\vspace{0.5em}
+\item \textbf{Cohort quality may vary}\\
+\textcolor{muted}{Single LTV estimate may not hold for all cohorts.}
+\vspace{0.5em}
+\item \textbf{Single creative, single market}\\
+\textcolor{muted}{Results may not generalize.}
+\end{enumerate}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}{Next Steps}
+\textbf{Validate:}
+\begin{itemize}
+\item Geo holdout test: ads on in some cities, off in others
+\item Measure lift in installs and revenue
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Operate:}
+\begin{itemize}
+\item Test weekday caps (flat vs weighted)
+\item Refresh creatives to address December drift
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Next Steps (II)}
+\textbf{Measure better:}
+\begin{itemize}
+\item Track LTV by cohort and source (paid vs non-attributed)
+\item Monitor D0/D7/D30 revenue weekly
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Scale:}
+\begin{itemize}
+\item Budget step test to map diminishing returns
+\item Then: increase spend where ROI holds
+\end{itemize}
+\end{frame}
+
+% =============================================================================
+% SUMMARY
+% =============================================================================
+\begin{frame}{Summary}
+\begin{center}
+\Large
+\textbf{This campaign works.}
+\end{center}
+
+\vspace{1em}
+\begin{columns}
+\column{0.33\textwidth}
+\centering
+\textbf{CPI\textsubscript{all}}\\
+\Large \$0.039
+\column{0.33\textwidth}
+\centering
+\textbf{LTV\textsubscript{30}}\\
+\Large \$0.092
+\column{0.33\textwidth}
+\centering
+\textbf{ROI}\\
+\Large \textcolor{profit}{+138\%}
+\end{columns}
+
+\pause
+\vspace{1.5em}
+\begin{center}
+\normalsize
+\textbf{Key insight:} The dashboard understated profit by half.\\[0.5em]
+\textbf{Opportunity:} Shift budget to better weekdays (+15\% on Tuesdays).\\[0.5em]
+\textbf{Next:} Validate with geo holdout, test weekday caps, refresh creatives.
+\end{center}
+\end{frame}
+
+% -----------------------------------------------------------------------------
+\begin{frame}[standout]
+Questions?
+\end{frame}
+
+\end{document}

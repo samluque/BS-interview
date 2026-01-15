@@ -23,4 +23,10 @@ data/raw/*
 
 # Reports are committed (static HTML exports for reviewers)
 
-
+# Slides build artifacts (keep .tex source, .py script, and generated .pdf)
+slides/*.aux
+slides/*.log
+slides/*.nav
+slides/*.out
+slides/*.snm
+slides/*.toc
